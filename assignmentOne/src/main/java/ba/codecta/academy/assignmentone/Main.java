@@ -28,6 +28,9 @@ public class Main {
         String tema="";
         zanroviZaIzbjeci = new ArrayList<>();
 
+        System.out.println("Welcome, guest! What is Your name?");
+        name = scanner.nextLine();
+
         if( args.length>0){
              tema = args[0].toLowerCase();
              for(int i =1; i<args.length; i++){
@@ -35,8 +38,6 @@ public class Main {
              }
         } else {
              boolean isSet=false;
-            System.out.println("Welcome, guest! What is Your name?");
-            name = scanner.nextLine();
              do {
                 System.out.println("Welcome to my app, " + name +"!");
                 System.out.println("Please choose Your world: ");
@@ -67,21 +68,53 @@ public class Main {
             } while (!isSet);
 
         }
-        if(tema.equals("disney")){
-            goToDisneyWorld();
-        } else if(tema.equals("movie")){
-            goToMovieWorld();
-        }
-        else{
-            System.out.println("There is no world with that option");
-            System.out.println("Exiting the app!");
-        }
+        boolean isActive = true;
+
+        do{
+            if(tema.equals("disney")){
+                goToDisneyWorld();
+            } else if(tema.equals("movie")){
+                goToMovieWorld();
+            }
+            else{
+                System.out.println("There is no world with that option");
+                System.out.println("Please try again or press 3 to quit");
+            }
+
+            System.out.println();
+            System.out.println("***************************");
+
+            System.out.println("Please enter Your selection: ");
+            System.out.println("1 - Go to DisneyWorld");
+            System.out.println("2- Go to MovieWorld");
+            System.out.println("3 - to quit the app");
+
+            int option = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (option){
+                case 1:
+                    tema="disney";
+                    break;
+                case 2:
+                    tema="movie";
+                    break;
+                case 3:
+                    isActive=false;
+                    break;
+                default:
+                    tema="undefined";
+                    break;
+            }
+
+
+        } while(isActive);
+
         logger.trace("Exiting application.");
 
 
     }
     private static void goToDisneyWorld(){
-        System.out.println("Welcome to DisneyWorld");
         boolean isActive = true;
 
         List<IDisneyland> parkovi = new ArrayList<IDisneyland>();
@@ -100,11 +133,8 @@ public class Main {
         ((FantasyLand) parkovi.get(2)).addCharacter(new DummyCharacter());
 
         do{
-            if(name.equals("")){
-                System.out.println("Welcome, guest! What is Your name?");
-                name = scanner.nextLine();
-            }
-            System.out.println("Welcome, " +  name +", enter your selection: ");
+
+            System.out.println("Welcome to DisneyWorld, " +  name +", enter your selection: ");
             logger.trace("User " + name + " started the DisneyWorld.");
 
 
@@ -151,11 +181,8 @@ public class Main {
         File file = new File("C:\\Users\\B.I.O.S. S\\Desktop\\codecta-academy\\codecta-academy\\assignmentOne\\movies.txt");
 
         Map<String, ArrayList<Movie>> filmovi = new HashMap<>();
+        System.out.println("Welcome to MovieWorld, " +  name +", enter your selection: ");
 
-        if(name.equals("")){
-            System.out.println("Welcome, guest! What is Your name?");
-            name = scanner.nextLine();
-        }
         logger.trace("User " + name + " started the MovieWorld.");
 
 
@@ -181,6 +208,7 @@ public class Main {
                     logger.error("Movie error!");
                 }
             }
+
             for (String zanr: filmovi.keySet()
                  ) {
 
@@ -201,6 +229,34 @@ public class Main {
                 System.out.println();
 
             }
+            boolean isActive=true;
+
+            do{
+                System.out.println("Enter your options (enter genre or anything else to quit):");
+                for (String zanr: filmovi.keySet()
+                ) {
+                    System.out.println(" Genre: " + zanr.toLowerCase());
+                }
+
+                String option = scanner.nextLine();
+                option=option.toLowerCase();
+
+                if(filmovi.containsKey(option.toLowerCase())){
+                    List<Movie> filmoviPoZanru = filmovi.get(option);
+                    System.out.println("Svi filmovi u zanru "+ option);
+                    for (Movie film: filmoviPoZanru
+                    ) {
+                        System.out.println(film.getName());
+                    }
+                    System.out.println();
+                }
+                else{
+                    isActive=false;
+                    System.out.println("Thank You for visiting MovieWorld!");
+                }
+
+            } while(isActive);
+
 
         }catch(FileNotFoundException e)
         {
