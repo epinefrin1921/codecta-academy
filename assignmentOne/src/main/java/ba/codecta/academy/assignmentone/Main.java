@@ -9,6 +9,7 @@ import ba.codecta.academy.assignmentone.disneylands.FantasyLand;
 import ba.codecta.academy.assignmentone.disneylands.IDisneyland;
 import ba.codecta.academy.assignmentone.disneylands.MickeyTown;
 import ba.codecta.academy.assignmentone.netflix.Movie;
+import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,26 +18,48 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class Main {
-    private static Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
 
     private static final Logger logger = LogManager.getLogger(Main.class);
     private static String name = "";
     private static List<String> zanroviZaIzbjeci;
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException {
 
         logger.trace("Entering application.");
         String tema="";
         zanroviZaIzbjeci = new ArrayList<>();
 
-        System.out.println("Welcome, guest! What is Your name?");
-        name = scanner.nextLine();
 
         if( args.length>0){
-             tema = args[0].toLowerCase();
-             for(int i =1; i<args.length; i++){
-                 zanroviZaIzbjeci.add(args[i].toLowerCase());
-             }
+            Options options = new Options();
+
+            options.addOption("w",  true, "Choose world (disney or movie).")
+                    .addOption("n", true, "Enter name");
+            Option optionGenres = Option.builder("g")
+                    .hasArg()
+                    .build();
+            optionGenres.setArgs(Option.UNLIMITED_VALUES);
+            options.addOption(optionGenres);
+
+            CommandLineParser parser = new DefaultParser();
+            CommandLine cmd = parser.parse( options, args);
+
+            if(cmd.hasOption("w")){
+                tema = cmd.getOptionValue("w");
+            }
+            if(cmd.hasOption("n")){
+                name=cmd.getOptionValue("n");
+            } else {
+                System.out.println("Welcome, guest! What is Your name?");
+                name = scanner.nextLine();
+            }
+            if(cmd.hasOption("g")){
+                String[] genres = cmd.getOptionValues("g");
+                zanroviZaIzbjeci.addAll(Arrays.asList(genres));
+            }
         } else {
+            System.out.println("Welcome, guest! What is Your name?");
+            name = scanner.nextLine();
              boolean isSet=false;
              do {
                 System.out.println("Welcome to my app, " + name +"!");
@@ -147,7 +170,7 @@ public class Main {
             option--;
             if(option >= 0 && option<parkovi.size()){
                 visitPark(parkovi.get(option));
-            } else if(option == parkovi.size()){
+            } else if(option >= parkovi.size()){
                 System.out.println("Thank You for playing!");
                 isActive = false;
             }
@@ -192,6 +215,7 @@ public class Main {
             while(skenerFilmova.hasNextLine()){
                String novaLinija = skenerFilmova.nextLine();
                 String [] newMovie = novaLinija.split(",");
+
                 if(newMovie.length==2) {
                     String zanr = newMovie[1].trim().toLowerCase();
                     String naziv = newMovie[0].trim();
