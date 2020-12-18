@@ -57,7 +57,6 @@ public class Repository<T extends ModelObject, PK extends Serializable> {
             result = findById(id);
         }
         if(id == null || result!= null) {
-            modelObject.setModifiedOn(LocalDateTime.now());
             entityManager.persist(modelObject);
             return modelObject;
         }

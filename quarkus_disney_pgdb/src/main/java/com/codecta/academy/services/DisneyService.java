@@ -1,8 +1,7 @@
 package com.codecta.academy.services;
 
 import com.codecta.academy.repository.entity.WelcomeMessage;
-import com.codecta.academy.services.model.CharacterDto;
-import com.codecta.academy.services.model.ParkDto;
+import com.codecta.academy.services.model.*;
 
 import java.util.List;
 
@@ -19,5 +18,7 @@ public interface DisneyService {
     ParkDto updateThemePark(Integer id, ParkDto themePark);
     List<CharacterDto> findCharacterByParkId(Integer id);
     List<ParkDto> findParkByCharacterName(String name);
-    List<CharacterDto> findCharactersByCharacterNameAndGreeting(String name, String greeting);
+    GiftDto addGift(GiftDto giftDto);
+    List<GiftDto> findAllGifts();
+    List<CharacterDto> findCharactersBySearchDto(SearchDto searchDto);
 }

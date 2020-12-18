@@ -1,16 +1,19 @@
 package com.codecta.academy;
 
 import com.codecta.academy.services.DisneyService;
-import com.codecta.academy.services.model.CharacterDto;
-import com.codecta.academy.services.model.ParkDto;
+import com.codecta.academy.services.WeatherService;
+import com.codecta.academy.services.model.*;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
 
 @Path("/disney")
 public class DisneyResource {
@@ -27,6 +30,13 @@ public class DisneyResource {
 
     @Inject
     DisneyService disneyService;
+
+    @Inject
+    @RestClient
+    WeatherService weatherService;
+
+    @Inject
+    Validator validator;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -88,6 +98,15 @@ public class DisneyResource {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response createThemePark(ParkDto park, @Context UriInfo uriInfo)
     {
+        Set<ConstraintViolation<ParkDto>> constraintViolations = validator.validate(park);
+        if(!constraintViolations.isEmpty()) {
+            StringBuilder builder = new StringBuilder();
+            for (ConstraintViolation<ParkDto> violation :
+                    constraintViolations) {
+                builder.append(violation.getMessage()).append(", ");
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity(new Error("VD-0001", "Invalid request in validation. >> " + builder.toString())).build();
+        }
         ParkDto themePark = disneyService.addThemePark(park);
         if(themePark != null) {
             UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -107,6 +126,18 @@ public class DisneyResource {
         }
         return Response.ok(themeParkList).build();
     }
+    @PUT
+    @Path("/themeparks/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateThemeParkById(@PathParam("id") Integer id, ParkDto park, @Context UriInfo uriInfo){
+        ParkDto themePark = disneyService.updateThemePark(id, park);
+        if(themePark != null) {
+            UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
+            uriBuilder.path(Integer.toString(themePark.getId()));
+            return Response.ok(uriBuilder.build()).entity(themePark).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }
 
     @GET
     @Path("/themeparks/{id}")
@@ -121,6 +152,17 @@ public class DisneyResource {
     }
 
     @GET
+    @Path("/themeparks/{id}/weather")
+    public Response getWeatherForThemePark(@PathParam("id") Integer id)
+    {
+        ParkDto themePark = disneyService.findThemeParkById(id);
+        if(themePark == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(weatherService.getWeather(themePark.getLocation(), "e93fcfe3c443ded48547f1ad30e89803", "metric")).build();
+
+    }
+    @GET
     @Path("/themeparks/{id}/characters")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCharactersByParkId(@PathParam("id") Integer id) {
@@ -134,44 +176,57 @@ public class DisneyResource {
     @GET
     @Path("/themeparks/search")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCharactersByParkName(@QueryParam("name") String name) {
+    public Response getCharactersByParkId(@QueryParam("name") String name) {
         List<ParkDto> parkDtoList = disneyService.findParkByCharacterName(name);
         if(parkDtoList == null) {
             return Response.noContent().build();
         }
         return Response.ok(parkDtoList).build();
     }
-    @PUT
-    @Path("/themeparks/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateThemeParkById(@PathParam("id") Integer id, ParkDto park, @Context UriInfo uriInfo){
-        ParkDto themePark = disneyService.updateThemePark(id, park);
-        if(themePark != null) {
-            UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
-            uriBuilder.path(Integer.toString(themePark.getId()));
-            return Response.ok(uriBuilder.build()).entity(themePark).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
-    }
     @GET
     @Path("/characters/search")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCharactersByNameAndGreeting(@QueryParam("name") String name, @QueryParam("greeting") String greeting) throws UnsupportedEncodingException {
-        URLEncoder.encode(greeting, StandardCharsets.UTF_8);
-        List<CharacterDto> characterDtoList = null;
-        System.out.println(name + greeting);
-//        if(name!=null && greeting != null){
-//            characterDtoList = disneyService.findCharactersByCharacterNameAndGreeting(name, greeting);
-//        }
-//        else if(name==null && greeting != null){
-//            characterDtoList = disneyService.findCharactersByCharacterGreeting(greeting);
-//        }
-//        else if(name!=null && greeting == null){
-//            characterDtoList = disneyService.findCharactersByCharacterName(name);
-//        }
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getCharactersByNameAndGreeting(@QueryParam("name") String name, @QueryParam("greeting") String greeting){
+        List<CharacterDto> characterDtoList;
+        SearchDto searchDto = new SearchDto();;
+        if(greeting!=null){
+            URLEncoder.encode(greeting, StandardCharsets.UTF_8);
+            searchDto.setGreeting(greeting);
+        }
+        if(name!=null){
+            searchDto.setName(name);
+        }
+        characterDtoList = disneyService.findCharactersBySearchDto(searchDto);
         if(characterDtoList == null) {
             return Response.noContent().build();
         }
         return Response.ok(characterDtoList).build();
     }
+
+    @POST
+    @Path("/gifts")
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response createGift(GiftDto gift, @Context UriInfo uriInfo) {
+        GiftDto giftDto = disneyService.addGift(gift);
+        if(giftDto != null) {
+            UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
+            uriBuilder.path(Integer.toString(giftDto.getId()));
+            return Response.created(uriBuilder.build()).entity(giftDto).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("GF-0001", "Invalid request.")).build();
+    }
+
+    @GET
+    @Path("/gifts")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllGifts()
+    {
+        List<GiftDto> giftDtoList = disneyService.findAllGifts();
+        if(giftDtoList == null || giftDtoList.isEmpty()) {
+            return Response.noContent().build();
+        }
+        return Response.ok(giftDtoList).build();
+    }
+
 }

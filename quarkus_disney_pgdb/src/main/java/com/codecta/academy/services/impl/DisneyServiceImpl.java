@@ -1,18 +1,20 @@
 package com.codecta.academy.services.impl;
 
+import com.codecta.academy.repository.DisneyCharacterRepository;
+import com.codecta.academy.repository.GiftRepository;
 import com.codecta.academy.repository.ThemeParkRepository;
 import com.codecta.academy.repository.entity.DisneyCharacter;
+import com.codecta.academy.repository.entity.Gift;
 import com.codecta.academy.repository.entity.ThemePark;
 import com.codecta.academy.repository.entity.WelcomeMessage;
-import com.codecta.academy.repository.DisneyCharacterRepository;
 import com.codecta.academy.services.DisneyService;
-import com.codecta.academy.services.model.CharacterDto;
-import com.codecta.academy.services.model.ParkDto;
+import com.codecta.academy.services.model.*;
 import org.modelmapper.ModelMapper;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,9 @@ public class DisneyServiceImpl implements DisneyService {
 
     @Inject
     ThemeParkRepository themeParkRepository;
+
+    @Inject
+    GiftRepository giftRepository;
 
     @Override
     public WelcomeMessage welcome() {
@@ -129,6 +134,7 @@ public class DisneyServiceImpl implements DisneyService {
             if(themePark.getLocation()!=null){
                 dbThemePark.setLocation(themePark.getLocation());
             }
+            dbThemePark.setModifiedOn(LocalDateTime.now());
             dbThemePark = themeParkRepository.save(dbThemePark);
             ModelMapper modelMapper = new ModelMapper();
             return modelMapper.map(dbThemePark, ParkDto.class);
@@ -167,18 +173,60 @@ public class DisneyServiceImpl implements DisneyService {
     }
 
     @Override
-    public List<CharacterDto> findCharactersByCharacterNameAndGreeting(String name, String greeting) {
-        List<DisneyCharacter> characterList = disneyCharacterRepository.findByCharacterNameAndGreeting(name, greeting);
-        if(characterList == null || characterList.isEmpty()){
+    public List<CharacterDto> findCharactersBySearchDto(SearchDto searchDto) {
+        List<DisneyCharacter> disneyCharacterList = disneyCharacterRepository.findByNameAndGreeting(searchDto.getName(), searchDto.getGreeting());
+        if(disneyCharacterList == null || disneyCharacterList.isEmpty()){
             return null;
         }
-        List <CharacterDto> characterDtoList = new ArrayList<>();
+        List<CharacterDto> characterDtoList = new ArrayList<>();
         ModelMapper modelMapper = new ModelMapper();
-        for (DisneyCharacter character: characterList
-             ) {
+        for(DisneyCharacter character : disneyCharacterList){
             characterDtoList.add(modelMapper.map(character, CharacterDto.class));
         }
         return characterDtoList;
     }
-}
 
+    @Override
+    public GiftDto addGift(GiftDto giftDto) {
+        if(giftDto.getCharacterIdList() == null || giftDto.getCharacterIdList().isEmpty()) {
+            return null;
+        }
+        List<DisneyCharacter> characterList = disneyCharacterRepository.findAllByIdList(giftDto.getCharacterIdList());
+        if(characterList == null || characterList.isEmpty()) {
+            return null;
+        }
+
+        ModelMapper modelMapper = new ModelMapper();
+        Gift gift = modelMapper.map(giftDto, Gift.class);
+        gift = giftRepository.add(gift);
+        for (DisneyCharacter character :
+                characterList) {
+            character.getGifts().add(gift);
+            gift.getCharacters().add(character);
+            disneyCharacterRepository.save(character);
+            giftRepository.save(gift);
+        }
+        giftDto = modelMapper.map(gift, GiftDto.class);
+        for(DisneyCharacter ch: gift.getCharacters()) {
+            giftDto.getCharacterIdList().add(ch.getId());
+        }
+        return  giftDto;
+    }
+
+    @Override
+    public List<GiftDto> findAllGifts() {
+        List<Gift> allGifts = giftRepository.findAll();
+        if(allGifts == null || allGifts.isEmpty()) {
+            return null;
+        }
+        List<GiftDto> result = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
+        for (Gift gift :
+                allGifts) {
+            GiftDto giftDto = modelMapper.map(gift, GiftDto.class);
+            result.add(giftDto);
+        }
+        return result;
+    }
+
+}

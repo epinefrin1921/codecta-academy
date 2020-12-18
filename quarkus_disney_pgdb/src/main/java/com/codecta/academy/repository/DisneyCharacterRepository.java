@@ -30,11 +30,29 @@ public class DisneyCharacterRepository extends Repository<DisneyCharacter, Integ
         TypedQuery<DisneyCharacter> allQuery = entityManager.createQuery(all);
         return allQuery.getResultList();
     }
-    public List<DisneyCharacter> findByCharacterNameAndGreeting(String name, String greeting){
-        Query query = entityManager.createQuery("SELECT distinct t FROM DisneyCharacter t  where t.name=:name and t.greeting = :greeting");
-        query.setParameter("name", name);
-        query.setParameter("greeting", greeting);
-        List resultList = query.getResultList();
-        return (List<DisneyCharacter>) resultList;
+
+    public List<DisneyCharacter> findAllByIdList(List<Integer> ids) {
+        Query query = entityManager.createQuery("SELECT d FROM DisneyCharacter d where d.id IN (:ids)");
+        query.setParameter("ids", ids);
+        return query.getResultList();
+    }
+
+    public List<DisneyCharacter> findByNameAndGreeting(String name, String greeting) {
+        Query query;
+        if(name!=null && greeting!=null){
+            query = entityManager.createNamedQuery("get_characters_by_name_and_greeting");
+            query.setParameter("name", name);
+            query.setParameter("greeting", greeting);
+        } else if(name==null && greeting!=null){
+            query = entityManager.createNamedQuery("get_characters_by_greeting");
+            query.setParameter("greeting", greeting);
+        }else if(name != null){
+            query = entityManager.createNamedQuery("get_characters_by_name");
+            query.setParameter("name", name);
+        } else{
+            query = entityManager.createNamedQuery("get_all_characters");
+        }
+
+        return query.getResultList();
     }
 }
