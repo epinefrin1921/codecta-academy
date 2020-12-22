@@ -2,7 +2,9 @@ package com.codecta.academy;
 
 import com.codecta.academy.services.DisneyService;
 import com.codecta.academy.services.WeatherService;
-import com.codecta.academy.services.model.*;
+import com.codecta.academy.services.model.CharacterDto;
+import com.codecta.academy.services.model.GiftDto;
+import com.codecta.academy.services.model.ParkDto;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.inject.Inject;
@@ -10,8 +12,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 
@@ -189,15 +189,7 @@ public class DisneyResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getCharactersByNameAndGreeting(@QueryParam("name") String name, @QueryParam("greeting") String greeting){
         List<CharacterDto> characterDtoList;
-        SearchDto searchDto = new SearchDto();;
-        if(greeting!=null){
-            URLEncoder.encode(greeting, StandardCharsets.UTF_8);
-            searchDto.setGreeting(greeting);
-        }
-        if(name!=null){
-            searchDto.setName(name);
-        }
-        characterDtoList = disneyService.findCharactersBySearchDto(searchDto);
+        characterDtoList = disneyService.findCharactersByNameAndGreeting(name, greeting);
         if(characterDtoList == null) {
             return Response.noContent().build();
         }

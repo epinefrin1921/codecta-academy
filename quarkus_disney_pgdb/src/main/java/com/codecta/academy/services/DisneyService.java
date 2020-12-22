@@ -20,5 +20,5 @@ public interface DisneyService {
     List<ParkDto> findParkByCharacterName(String name);
     GiftDto addGift(GiftDto giftDto);
     List<GiftDto> findAllGifts();
-    List<CharacterDto> findCharactersBySearchDto(SearchDto searchDto);
+    List<CharacterDto> findCharactersByNameAndGreeting(String name, String greeting);
 }

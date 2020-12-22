@@ -173,8 +173,8 @@ public class DisneyServiceImpl implements DisneyService {
     }
 
     @Override
-    public List<CharacterDto> findCharactersBySearchDto(SearchDto searchDto) {
-        List<DisneyCharacter> disneyCharacterList = disneyCharacterRepository.findByNameAndGreeting(searchDto.getName(), searchDto.getGreeting());
+    public List<CharacterDto> findCharactersByNameAndGreeting(String name, String greeting) {
+        List<DisneyCharacter> disneyCharacterList = disneyCharacterRepository.findByNameAndGreeting(name, greeting);
         if(disneyCharacterList == null || disneyCharacterList.isEmpty()){
             return null;
         }
