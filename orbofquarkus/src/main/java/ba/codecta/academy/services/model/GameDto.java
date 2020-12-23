@@ -8,17 +8,16 @@ public class GameDto {
     private Integer id;
     private String playerNickname;
     private Level level;
-    private Integer characterId;
-    private GameCharacterDto character=null;
+    private GameCharacterDto character;
     private List<PowerUpDto> powerUpList;
+    private GameMapDto gameMap;
 
-
-    public Integer getCharacterId() {
-        return characterId;
+    public GameMapDto getGameMap() {
+        return gameMap;
     }
 
-    public void setCharacterId(Integer character) {
-        this.characterId = character;
+    public void setGameMap(GameMapDto gameMap) {
+        this.gameMap = gameMap;
     }
 
     public GameCharacterDto getCharacter() {

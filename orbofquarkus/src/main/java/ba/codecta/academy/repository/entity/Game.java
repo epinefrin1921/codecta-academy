@@ -23,9 +23,11 @@ public class Game extends ModelObject{
     private GameCharacter character;
     private Integer health;
 
-
     private LocalDateTime finishedOn; //if null, game is still active and can be continued
     private Level level;
+
+    @ManyToOne
+    private GameMap gameMap;
 
     @ManyToMany
     @JoinTable(
@@ -39,6 +41,14 @@ public class Game extends ModelObject{
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public GameMap getGameMap() {
+        return gameMap;
+    }
+
+    public void setGameMap(GameMap gameMap) {
+        this.gameMap = gameMap;
     }
 
     public Integer getHealth() {

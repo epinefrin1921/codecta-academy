@@ -25,6 +25,9 @@ public class PowerUp extends ModelObject{
     @ManyToMany(mappedBy = "powerUpList")
     private List<Game> games = new ArrayList<>();
 
+    @OneToMany(mappedBy = "powerUp", fetch = FetchType.LAZY)
+    private List<Dungeon> dungeons = new ArrayList<>();
+
     public String getName() {
         return name;
     }

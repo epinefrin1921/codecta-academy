@@ -1,9 +1,7 @@
 package ba.codecta.academy;
 
 import ba.codecta.academy.services.GameService;
-import ba.codecta.academy.services.model.GameCharacterDto;
-import ba.codecta.academy.services.model.GameDto;
-import ba.codecta.academy.services.model.PowerUpDto;
+import ba.codecta.academy.services.model.*;
 
 import javax.inject.Inject;
 import javax.validation.Validator;
@@ -60,14 +58,14 @@ public class OrbOfQuarkus {
     @Path("/game")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createGame(GameDto game, @Context UriInfo uriInfo){
+    public Response createGame(GameStartDto game, @Context UriInfo uriInfo){
         GameDto addedGame = gameService.addGame(game);
         if(addedGame != null){
             UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
             uriBuilder.path(Integer.toString(addedGame.getId()));
             return Response.created(uriBuilder.build()).entity(addedGame).build();
         }
-        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request. Unknown theme park in request.")) .build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request.")) .build();
     }
     @PUT
     @Path("/game/{id}")
@@ -126,7 +124,7 @@ public class OrbOfQuarkus {
             uriBuilder.path(Integer.toString(gameCharacter.getId()));
             return Response.created(uriBuilder.build()).entity(gameCharacter).build();
         }
-        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request. Unknown theme park in request.")) .build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request.")) .build();
     }
 
     @GET
@@ -164,6 +162,115 @@ public class OrbOfQuarkus {
             return Response.created(uriBuilder.build()).entity(powerUpDto).build();
 
         }
-        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request. Unknown theme park in request.")) .build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request.")) .build();
     }
+
+    @GET
+    @Path("/dungeons")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllDungeons(){
+        List<DungeonDto> dungeonDtoList = gameService.findAllDungeons();
+        if(dungeonDtoList==null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(dungeonDtoList).build();
+    }
+    @GET
+    @Path("/dungeons/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDungeonById(@PathParam("id") Integer id)
+    {
+        DungeonDto dungeonDto = gameService.findDungeonById(id);
+        if(dungeonDto == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(dungeonDto).build();
+    }
+    @POST
+    @Path("/dungeons")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createDungeon(DungeonDto dungeon, @Context UriInfo uriInfo){
+        DungeonDto dungeonDto = gameService.addDungeon(dungeon);
+        if(dungeonDto!= null){
+            UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
+            uriBuilder.path(Integer.toString(dungeonDto.getId()));
+            return Response.created(uriBuilder.build()).entity(dungeonDto).build();
+
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request.")) .build();
+    }
+
+    @GET
+    @Path("/monsters")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllMonsters(){
+        List<MonsterDto> monsterDtoList = gameService.findAllMonsters();
+        if(monsterDtoList==null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(monsterDtoList).build();
+    }
+    @GET
+    @Path("/monsters/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMonsterById(@PathParam("id") Integer id)
+    {
+        MonsterDto monsterDto = gameService.findMonsterById(id);
+        if(monsterDto == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(monsterDto).build();
+    }
+    @POST
+    @Path("/monsters")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createMonster(MonsterDto monster, @Context UriInfo uriInfo){
+        MonsterDto monsterDto = gameService.addMonster(monster);
+        if(monsterDto!= null){
+            UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
+            uriBuilder.path(Integer.toString(monsterDto.getId()));
+            return Response.created(uriBuilder.build()).entity(monsterDto).build();
+
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request.")) .build();
+    }
+
+    @GET
+    @Path("/gamemaps")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllGameMaps(){
+        List<GameMapDto> gameMapDtoList = gameService.findAllGameMaps();
+        if(gameMapDtoList==null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(gameMapDtoList).build();
+    }
+    @GET
+    @Path("/gamemaps/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getGameMapById(@PathParam("id") Integer id)
+    {
+        GameMapDto gameMapDto = gameService.findGameMapById(id);
+        if(gameMapDto == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(gameMapDto).build();
+    }
+    @POST
+    @Path("/gamemaps")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createGameMap(GameMapDto gameMap, @Context UriInfo uriInfo){
+        GameMapDto gameMapDto = gameService.addGameMap(gameMap);
+        if(gameMapDto!= null){
+            UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
+            uriBuilder.path(Integer.toString(gameMapDto.getId()));
+            return Response.created(uriBuilder.build()).entity(gameMapDto).build();
+
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request.")) .build();
+    }
+
 }

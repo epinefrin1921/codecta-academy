@@ -1,15 +1,9 @@
 package ba.codecta.academy.services.impl;
 
-import ba.codecta.academy.repository.GameCharacterRepository;
-import ba.codecta.academy.repository.GameRepository;
-import ba.codecta.academy.repository.PowerUpsRepository;
-import ba.codecta.academy.repository.entity.Game;
-import ba.codecta.academy.repository.entity.GameCharacter;
-import ba.codecta.academy.repository.entity.PowerUp;
+import ba.codecta.academy.repository.*;
+import ba.codecta.academy.repository.entity.*;
 import ba.codecta.academy.services.GameService;
-import ba.codecta.academy.services.model.GameCharacterDto;
-import ba.codecta.academy.services.model.GameDto;
-import ba.codecta.academy.services.model.PowerUpDto;
+import ba.codecta.academy.services.model.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
@@ -18,6 +12,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @ApplicationScoped
 @Transactional
@@ -30,6 +25,15 @@ public class gameServiceImpl implements GameService {
 
     @Inject
     PowerUpsRepository powerUpsRepository;
+
+    @Inject
+    DungeonRepository dungeonRepository;
+
+    @Inject
+    GameMapRepository gameMapRepository;
+
+    @Inject
+    MonsterRepository monsterRepository;
 
     @Override
     public String welcome() {
@@ -61,21 +65,28 @@ public class gameServiceImpl implements GameService {
     }
 
     @Override
-    public GameDto addGame(GameDto game) {
+    public GameDto addGame(GameStartDto gameStart) {
 
-        GameCharacter character = gameCharacterRepository.findById(game.getCharacterId());
+        GameCharacter character = gameCharacterRepository.findById(gameStart.getCharacterId());
         if(character == null){
             return null;
         }
 
         ModelMapper modelMapper = new ModelMapper();
 
-        game.setCharacter(modelMapper.map(character, GameCharacterDto.class));
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        Game gameInBase = modelMapper.map(game, Game.class);
-        gameInBase.setLevel(game.getLevel());
+
+        Random rand = new Random();
+
+        List<GameMap> mapList = gameMapRepository.findAll();
+
+        int random = rand.nextInt(mapList.size());
+
+        Game gameInBase = modelMapper.map(gameStart, Game.class);
+        gameInBase.setLevel(gameStart.getLevel());
         gameInBase.setCharacter(character);
-        gameInBase.setPlayerNickname(game.getPlayerNickname());
+        gameInBase.setGameMap(mapList.get(random));
+        gameInBase.setPlayerNickname(gameStart.getPlayerNickname());
         gameInBase.setHealth(character.getHealth());
         gameInBase = gameRepository.add(gameInBase);
 
@@ -180,6 +191,136 @@ public class gameServiceImpl implements GameService {
 
     @Override
     public PowerUpDto updatePowerUp(Integer id, PowerUpDto powerUp) {
+        return null;
+    }
+
+    @Override
+    public List<MonsterDto> findAllMonsters() {
+        List<Monster> monsterList = monsterRepository.findAll();
+
+        if(monsterList == null || monsterList.isEmpty()){
+            return null;
+        }
+        List<MonsterDto> monsterDtoList = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
+        for(Monster monster : monsterList){
+            monsterDtoList.add(modelMapper.map(monster, MonsterDto.class));
+        }
+        return monsterDtoList;
+    }
+
+    @Override
+    public MonsterDto findMonsterById(Integer id) {
+        Monster monster = monsterRepository.findById(id);
+        if(monster == null){
+            return null;
+        }
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(monster, MonsterDto.class);
+    }
+
+    @Override
+    public MonsterDto addMonster(MonsterDto monster) {
+        ModelMapper modelMapper = new ModelMapper();
+        Monster monsterInBase = modelMapper.map(monster, Monster.class);
+        monsterInBase = monsterRepository.add(monsterInBase);
+        return modelMapper.map(monsterInBase, MonsterDto.class);
+    }
+
+    @Override
+    public MonsterDto updateMonster(Integer id, MonsterDto monster) {
+        return null;
+    }
+
+    @Override
+    public List<DungeonDto> findAllDungeons() {
+        List<Dungeon> dungeonList = dungeonRepository.findAll();
+        if(dungeonList == null || dungeonList.isEmpty()){
+            return null;
+        }
+        List<DungeonDto> dungeonDtoList = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
+        for(Dungeon dungeon : dungeonList){
+            dungeonDtoList.add(modelMapper.map(dungeon, DungeonDto.class));
+        }
+        return dungeonDtoList;
+    }
+
+    @Override
+    public DungeonDto findDungeonById(Integer id) {
+        Dungeon dungeon =dungeonRepository.findById(id);
+        if(dungeon == null){
+            return null;
+        }
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(dungeon, DungeonDto.class);
+    }
+
+    @Override
+    public DungeonDto addDungeon(DungeonDto dungeon) {
+        ModelMapper modelMapper = new ModelMapper();
+        Dungeon dungeonInBase = modelMapper.map(dungeon, Dungeon.class);
+        Random rand = new Random();
+
+        List<Monster> monsterList =monsterRepository.findAll();
+        List<PowerUp> powerUpList = powerUpsRepository.findAll();
+        int random = rand.nextInt(monsterList.size());
+        dungeonInBase.setMonster(monsterList.get(random));
+        random = rand.nextInt(powerUpList.size());
+        dungeonInBase.setPowerUp(powerUpList.get(random));
+        dungeonInBase = dungeonRepository.add(dungeonInBase);
+        return modelMapper.map(dungeonInBase, DungeonDto.class);
+    }
+
+    @Override
+    public DungeonDto updateDungeon(Integer id, DungeonDto dungeon) {
+        return null;
+    }
+
+    @Override
+    public List<GameMapDto> findAllGameMaps() {
+        List<GameMap> gameMapList = gameMapRepository.findAll();
+        if(gameMapList == null || gameMapList.isEmpty()){
+            return null;
+        }
+        List<GameMapDto> gameMapDtoList = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
+        for(GameMap gameMap : gameMapList){
+            gameMapDtoList.add(modelMapper.map(gameMap, GameMapDto.class));
+        }
+        return gameMapDtoList;
+    }
+
+    @Override
+    public GameMapDto findGameMapById(Integer id) {
+        GameMap gameMap = gameMapRepository.findById(id);
+        if(gameMap == null){
+            return null;
+        }
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(gameMap, GameMapDto.class);
+    }
+
+    @Override
+    public GameMapDto addGameMap(GameMapDto gameMap) {
+        ModelMapper modelMapper = new ModelMapper();
+        GameMap gameMapInBase = modelMapper.map(gameMap, GameMap.class);
+        List<Dungeon> dungeonList = dungeonRepository.findAll();
+        Random rand = new Random();
+        gameMapInBase.setDungeons(new ArrayList<>());
+
+        for(int i=0;i<10;i++){
+            int random = rand.nextInt(dungeonList.size());
+            Dungeon randomDungeon = dungeonList.get(random);
+            gameMapInBase.getDungeons().add(randomDungeon);
+        }
+
+        gameMapInBase = gameMapRepository.add(gameMapInBase);
+        return modelMapper.map(gameMapInBase, GameMapDto.class);
+    }
+
+    @Override
+    public GameMapDto updateGameMap(Integer id, GameMapDto gameMap) {
         return null;
     }
 }
