@@ -11,7 +11,7 @@ public interface GameService {
     List<GameDto> findAllGames();
     GameDto findGameById(Integer id);
     GameDto addGame(GameStartDto game);
-    GameDto updateGame(Integer id, GameDto game);
+    GameDto updateGame(Integer id, GameStartDto game);
     GameDto addPowerUpToGame(Integer gameIdInteger, Integer powerUpId);
 
     //for character entity
@@ -38,9 +38,8 @@ public interface GameService {
     DungeonDto addDungeon(DungeonDto dungeon);
     DungeonDto updateDungeon(Integer id, DungeonDto dungeon);
 
-    //for game map entity
+    //for game map entity, no update functionalities
     List<GameMapDto> findAllGameMaps();
     GameMapDto findGameMapById(Integer id);
     GameMapDto addGameMap(GameMapDto gameMap);
-    GameMapDto updateGameMap(Integer id, GameMapDto gameMap);
 }

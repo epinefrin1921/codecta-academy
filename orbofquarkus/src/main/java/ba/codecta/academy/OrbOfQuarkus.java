@@ -4,7 +4,6 @@ import ba.codecta.academy.services.GameService;
 import ba.codecta.academy.services.model.*;
 
 import javax.inject.Inject;
-import javax.validation.Validator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
@@ -23,15 +22,12 @@ public class OrbOfQuarkus {
     @Inject
     GameService gameService;
 
-    @Inject
-    Validator validator;
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response hello() {
+    public Response start() {
         return Response.ok(gameService.welcome()).build();
     }
-
+    //game
     @GET
     @Path("/game")
     @Produces(MediaType.APPLICATION_JSON)
@@ -65,13 +61,13 @@ public class OrbOfQuarkus {
             uriBuilder.path(Integer.toString(addedGame.getId()));
             return Response.created(uriBuilder.build()).entity(addedGame).build();
         }
-        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request.")) .build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request. Cannot post that game. Try changing some attributes and try again")) .build();
     }
     @PUT
     @Path("/game/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateGameById(@PathParam("id") Integer id, GameDto game){
+    public Response updateGameById(@PathParam("id") Integer id, GameStartDto game){
         GameDto gameDto = gameService.updateGame(id, game);
         if(gameDto == null){
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -79,7 +75,7 @@ public class OrbOfQuarkus {
         return Response.ok(gameDto).build();
     }
     @POST
-    @Path("/game/{id}")
+    @Path("/game/{id}/powerup")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addPowerUpToGame(@PathParam("id") Integer id, Integer powerUp){
@@ -89,7 +85,8 @@ public class OrbOfQuarkus {
         }
         return Response.ok(gameDto).build();
     }
-
+    //add get powerup
+    //character
     @GET
     @Path("/characters")
     @Produces(MediaType.APPLICATION_JSON)
@@ -126,7 +123,18 @@ public class OrbOfQuarkus {
         }
         return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request.")) .build();
     }
-
+    @PUT
+    @Path("/characters/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateCharacterById(@PathParam("id") Integer id, GameCharacterDto character){
+        GameCharacterDto gameCharacterDto = gameService.updateGameCharacter(id, character);
+        if(gameCharacterDto == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(gameCharacterDto).build();
+    }
+    //powerups
     @GET
     @Path("/powerups")
     @Produces(MediaType.APPLICATION_JSON)
@@ -164,7 +172,18 @@ public class OrbOfQuarkus {
         }
         return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request.")) .build();
     }
-
+    @PUT
+    @Path("/powerups/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updatePowerUpById(@PathParam("id") Integer id, PowerUpDto powerUp){
+        PowerUpDto powerUpDto = gameService.updatePowerUp(id, powerUp);
+        if(powerUpDto == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(powerUpDto).build();
+    }
+    //dungeons
     @GET
     @Path("/dungeons")
     @Produces(MediaType.APPLICATION_JSON)
@@ -200,7 +219,18 @@ public class OrbOfQuarkus {
         }
         return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request.")) .build();
     }
-
+    @PUT
+    @Path("/dungeons/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateDungeonById(@PathParam("id") Integer id, DungeonDto dungeonDto){
+        DungeonDto dungeon = gameService.updateDungeon(id, dungeonDto);
+        if(dungeon == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(dungeon).build();
+    }
+    //monsters
     @GET
     @Path("/monsters")
     @Produces(MediaType.APPLICATION_JSON)
@@ -236,7 +266,18 @@ public class OrbOfQuarkus {
         }
         return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request.")) .build();
     }
-
+    @PUT
+    @Path("/monsters/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateMonsterById(@PathParam("id") Integer id, MonsterDto monster){
+        MonsterDto monsterDto = gameService.updateMonster(id, monster);
+        if(monsterDto == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(monsterDto).build();
+    }
+    //game maps, no update
     @GET
     @Path("/gamemaps")
     @Produces(MediaType.APPLICATION_JSON)

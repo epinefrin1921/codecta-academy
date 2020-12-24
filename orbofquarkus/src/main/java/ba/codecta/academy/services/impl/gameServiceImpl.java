@@ -10,6 +10,7 @@ import org.modelmapper.convention.MatchingStrategies;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -94,12 +95,13 @@ public class gameServiceImpl implements GameService {
     }
 
     @Override
-    public GameDto updateGame(Integer id, GameDto game) {
+    public GameDto updateGame(Integer id, GameStartDto game) {
         Game gameInBase = gameRepository.findById(id);
         if(gameInBase != null){
-            gameInBase.setCharacter(gameCharacterRepository.findById(game.getId()));
+            gameInBase.setCharacter(gameCharacterRepository.findById(game.getCharacterId()));
             gameInBase.setLevel(game.getLevel());
             gameInBase.setPlayerNickname(game.getPlayerNickname());
+            gameInBase.setModifiedOn(LocalDateTime.now());
             gameInBase = gameRepository.save(gameInBase);
             ModelMapper modelMapper = new ModelMapper();
             return modelMapper.map(gameInBase, GameDto.class);
@@ -154,6 +156,16 @@ public class gameServiceImpl implements GameService {
 
     @Override
     public GameCharacterDto updateGameCharacter(Integer id, GameCharacterDto gameCharacter) {
+        GameCharacter gameCharacterInBase = gameCharacterRepository.findById(id);
+        if(gameCharacterInBase != null){
+            gameCharacterInBase.setName(gameCharacter.getName());
+            gameCharacterInBase.setHealth(gameCharacter.getHealth());
+            gameCharacterInBase.setDescription(gameCharacter.getDescription());
+            gameCharacterInBase.setModifiedOn(LocalDateTime.now());
+            gameCharacterInBase.setStrength(gameCharacter.getStrength());
+            ModelMapper modelMapper = new ModelMapper();
+            return modelMapper.map(gameCharacterInBase, GameCharacterDto.class);
+        }
         return null;
     }
 
@@ -191,6 +203,16 @@ public class gameServiceImpl implements GameService {
 
     @Override
     public PowerUpDto updatePowerUp(Integer id, PowerUpDto powerUp) {
+        PowerUp powerUpInBase = powerUpsRepository.findById(id);
+        if(powerUpInBase != null){
+            powerUpInBase.setDescription(powerUp.getDescription());
+            powerUpInBase.setName(powerUp.getName());
+            powerUpInBase.setStrength(powerUp.getStrength());
+            powerUpInBase.setPurpose(powerUp.getPurpose());
+            powerUpInBase.setModifiedOn(LocalDateTime.now());
+            ModelMapper modelMapper = new ModelMapper();
+            return modelMapper.map(powerUpInBase, PowerUpDto.class);
+        }
         return null;
     }
 
@@ -229,6 +251,17 @@ public class gameServiceImpl implements GameService {
 
     @Override
     public MonsterDto updateMonster(Integer id, MonsterDto monster) {
+        Monster monsterInBase = monsterRepository.findById(id);
+        if(monsterInBase != null){
+           monsterInBase.setStrength(monster.getStrength());
+           monsterInBase.setHealth(monster.getHealth());
+           monsterInBase.setDescription(monster.getDescription());
+           monsterInBase.setName(monster.getName());
+           monsterInBase.setModifiedOn(LocalDateTime.now());
+
+            ModelMapper modelMapper = new ModelMapper();
+            return modelMapper.map(monsterInBase, MonsterDto.class);
+        }
         return null;
     }
 
@@ -274,6 +307,15 @@ public class gameServiceImpl implements GameService {
 
     @Override
     public DungeonDto updateDungeon(Integer id, DungeonDto dungeon) {
+        Dungeon dungeonInBase = dungeonRepository.findById(id);
+        if(dungeonInBase != null){
+           dungeonInBase.setName(dungeon.getName());
+           dungeonInBase.setDescription(dungeon.getDescription());
+           dungeonInBase.setModifiedOn(LocalDateTime.now());
+
+            ModelMapper modelMapper = new ModelMapper();
+            return modelMapper.map(dungeonInBase, DungeonDto.class);
+        }
         return null;
     }
 
@@ -305,22 +347,21 @@ public class gameServiceImpl implements GameService {
     public GameMapDto addGameMap(GameMapDto gameMap) {
         ModelMapper modelMapper = new ModelMapper();
         GameMap gameMapInBase = modelMapper.map(gameMap, GameMap.class);
-        List<Dungeon> dungeonList = dungeonRepository.findAll();
+        List<Dungeon> dungeonList = dungeonRepository.getDungeonsWithoutOrb();
         Random rand = new Random();
         gameMapInBase.setDungeons(new ArrayList<>());
 
-        for(int i=0;i<10;i++){
+        for(int i=0;i<9;i++){
             int random = rand.nextInt(dungeonList.size());
             Dungeon randomDungeon = dungeonList.get(random);
             gameMapInBase.getDungeons().add(randomDungeon);
         }
+        List<Dungeon> dungeonOrbList = dungeonRepository.getDungeonsWithOrb();
+        int random = rand.nextInt(dungeonOrbList.size());
+        Dungeon randomDungeon = dungeonOrbList.get(random);
+        gameMapInBase.getDungeons().add(randomDungeon);
 
         gameMapInBase = gameMapRepository.add(gameMapInBase);
         return modelMapper.map(gameMapInBase, GameMapDto.class);
-    }
-
-    @Override
-    public GameMapDto updateGameMap(Integer id, GameMapDto gameMap) {
-        return null;
     }
 }
