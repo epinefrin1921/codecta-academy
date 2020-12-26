@@ -6,6 +6,7 @@ public class GameStartDto {
     private String playerNickname;
     private Level level;
     private Integer characterId;
+    private Integer mapId;
 
     public String getPlayerNickname() {
         return playerNickname;
@@ -29,5 +30,13 @@ public class GameStartDto {
 
     public void setCharacterId(Integer characterId) {
         this.characterId = characterId;
+    }
+
+    public Integer getMapId() {
+        return mapId;
+    }
+
+    public void setMapId(Integer mapId) {
+        this.mapId = mapId;
     }
 }

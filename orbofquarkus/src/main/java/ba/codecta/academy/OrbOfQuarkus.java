@@ -74,16 +74,82 @@ public class OrbOfQuarkus {
         }
         return Response.ok(gameDto).build();
     }
+//    @POST
+//    @Path("/game/{id}/powerup")
+//    @Consumes(MediaType.TEXT_PLAIN)
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response addPowerUpToGame(@PathParam("id") Integer id, Integer powerUp){
+//        GameDto gameDto = gameService.addPowerUpToGame(id, powerUp);
+//        if(gameDto == null){
+//            return Response.status(Response.Status.NOT_FOUND).build();
+//        }
+//        return Response.ok(gameDto).build();
+//    }
+    //ACTIONS
     @POST
     @Path("/game/{id}/powerup")
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addPowerUpToGame(@PathParam("id") Integer id, Integer powerUp){
-        GameDto gameDto = gameService.addPowerUpToGame(id, powerUp);
-        if(gameDto == null){
-            return Response.status(Response.Status.NOT_FOUND).build();
+    public Response usePowerUp(@PathParam("id") Integer id, PowerUpDto powerUp){
+        GameDto gameDto = gameService.usePowerUp(id, powerUp);
+        if(gameDto!=null){
+            return Response.ok(gameDto).build();
         }
-        return Response.ok(gameDto).build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("QoQ-001", "No power up in backpack.")) .build();
+    }
+    @POST
+    @Path("/game/{id}/move")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response moveGame(@PathParam("id") Integer id){
+        GameDto gameDto = gameService.move(id);
+        if(gameDto!=null){
+            return Response.ok(gameDto).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("QoQ-002", "Cannot move. Beat the enemy in the dungeon/ (or at the end of the map)")) .build();
+    }
+    @POST
+    @Path("/game/{id}/fight")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response fight(@PathParam("id") Integer id){
+        GameDto gameDto = gameService.fight(id);
+        if(gameDto!=null){
+            return Response.ok(gameDto).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("QoQ-003", "Cannot fight.")) .build();
+    }
+    @POST
+    @Path("/game/{id}/goback")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response goBack(@PathParam("id") Integer id){
+        GameDto gameDto = gameService.goBack(id);
+        if(gameDto!=null){
+            return Response.ok(gameDto).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("QoQ-004", "Cannot go back. Maybe You are in the first dungeon? Is the enemy still alive?")) .build();
+    }
+    @POST
+    @Path("/game/{id}/flee")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response flee(@PathParam("id") Integer id){
+        GameDto gameDto = gameService.flee(id);
+        if(gameDto!=null){
+            return Response.ok(gameDto).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("QoQ-005", "Cannot flee. Maybe You are in the first dungeon? Is the enemy still alive?")) .build();
+    }
+    @POST
+    @Path("/game/{id}/collectpowerup")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response collectPowerUp(@PathParam("id") Integer id){
+        GameDto gameDto = gameService.collect(id);
+        if(gameDto!=null){
+            return Response.ok(gameDto).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("QoQ-006", "Cannot collect powerup. Maybe You already have that powerup in backpack or the enemy is still alive")) .build();
     }
     //add get powerup
     //character
@@ -313,5 +379,6 @@ public class OrbOfQuarkus {
         }
         return Response.status(Response.Status.BAD_REQUEST).entity(new Error("CDT-001", "Invalid request.")) .build();
     }
+
 
 }

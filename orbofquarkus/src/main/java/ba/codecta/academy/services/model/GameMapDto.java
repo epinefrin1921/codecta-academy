@@ -7,6 +7,7 @@ public class GameMapDto {
     private String description;
     private String name;
     private List<DungeonDto> dungeons;
+    private List<Integer> dungeonsIds;
 
     public Integer getId() {
         return id;
@@ -14,6 +15,14 @@ public class GameMapDto {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public List<Integer> getDungeonsIds() {
+        return dungeonsIds;
+    }
+
+    public void setDungeonsIds(List<Integer> dungeonsIds) {
+        this.dungeonsIds = dungeonsIds;
     }
 
     public String getDescription() {

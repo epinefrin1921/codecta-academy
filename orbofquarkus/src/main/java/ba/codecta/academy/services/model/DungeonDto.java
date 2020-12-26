@@ -3,12 +3,30 @@ package ba.codecta.academy.services.model;
 public class DungeonDto {
     private Integer id;
     private MonsterDto monster;
+    private Integer monsterId;
     private String description;
     private String name;
     private PowerUpDto powerUp;
+    private Integer powerUpId;
+
+    public Integer powerNumber() {
+        return powerUpId;
+    }
+
+    public void setPowerUpId(Integer powerUpId) {
+        this.powerUpId = powerUpId;
+    }
 
     public Integer getId() {
         return id;
+    }
+
+    public Integer monsterNumber() {
+        return monsterId;
+    }
+
+    public void setMonsterId(Integer monsterId) {
+        this.monsterId = monsterId;
     }
 
     public void setId(Integer id) {

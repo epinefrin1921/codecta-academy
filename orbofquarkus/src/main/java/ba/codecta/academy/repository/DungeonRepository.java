@@ -14,11 +14,11 @@ public class DungeonRepository extends Repository<Dungeon, Integer>{
         super(Dungeon.class);
     }
     public List<Dungeon> getDungeonsWithOrb(){
-        Query query = entityManager.createQuery("SELECT d FROM Dungeon d, PowerUp p where d.powerUp.id=p.id and p.purpose=3");
+        Query query = entityManager.createQuery("SELECT d FROM Dungeon d, PowerUp p where d.powerUp.id=p.id and p.purpose=2");
         return query.getResultList();
     }
     public List<Dungeon> getDungeonsWithoutOrb(){
-        Query query = entityManager.createQuery("SELECT d FROM Dungeon d, PowerUp p where d.powerUp.id=p.id and p.purpose<3");
+        Query query = entityManager.createQuery("SELECT d FROM Dungeon d, PowerUp p where d.powerUp.id=p.id and p.purpose<2");
         return query.getResultList();
     }
 }

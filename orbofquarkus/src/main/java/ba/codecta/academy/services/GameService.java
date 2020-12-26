@@ -12,7 +12,7 @@ public interface GameService {
     GameDto findGameById(Integer id);
     GameDto addGame(GameStartDto game);
     GameDto updateGame(Integer id, GameStartDto game);
-    GameDto addPowerUpToGame(Integer gameIdInteger, Integer powerUpId);
+//    GameDto addPowerUpToGame(Integer gameIdInteger, Integer powerUpId);
 
     //for character entity
     List<GameCharacterDto> findAllGameCharacters();
@@ -42,4 +42,12 @@ public interface GameService {
     List<GameMapDto> findAllGameMaps();
     GameMapDto findGameMapById(Integer id);
     GameMapDto addGameMap(GameMapDto gameMap);
+
+    GameDto usePowerUp(Integer id, PowerUpDto powerUp);
+    GameDto move(Integer id);
+    GameDto goBack(Integer id);
+    GameDto fight(Integer id);
+    GameDto flee(Integer id);
+    GameDto collect(Integer id);
+
 }

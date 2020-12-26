@@ -18,10 +18,18 @@ public class Game extends ModelObject{
     @Column(name = "ID", nullable = false)
     private Integer id;
     private String playerNickname;
+    private Integer currentDungeonId;
+    private Integer highestDungeonId;
+    private Integer currentDungeonMonsterHealth;
+    private Integer currentDungeonMonsterStrength;
+    private Integer score;
+
+    private Outcome outcome;
 
     @ManyToOne
     private GameCharacter character;
     private Integer health;
+    private Integer strength;
 
     private LocalDateTime finishedOn; //if null, game is still active and can be continued
     private Level level;
@@ -38,6 +46,45 @@ public class Game extends ModelObject{
     )
     private List<PowerUp> powerUpList = new ArrayList<>();
 
+    public Integer getCurrentDungeonMonsterStrength() {
+        return currentDungeonMonsterStrength;
+    }
+
+    public void setCurrentDungeonMonsterStrength(Integer getCurrentDungeonMonsterStrength) {
+        this.currentDungeonMonsterStrength = getCurrentDungeonMonsterStrength;
+    }
+
+    public Integer getHighestDungeonId() {
+        return highestDungeonId;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
+    }
+
+    public Outcome getOutcome() {
+        return outcome;
+    }
+
+    public void setOutcome(Outcome outcome) {
+        this.outcome = outcome;
+    }
+
+    public void setHighestDungeonId(Integer highestDungeonId) {
+        this.highestDungeonId = highestDungeonId;
+    }
+
+    public Integer getCurrentDungeonMonsterHealth() {
+        return currentDungeonMonsterHealth;
+    }
+
+    public void setCurrentDungeonMonsterHealth(Integer currentDungeonMonsterHealth) {
+        this.currentDungeonMonsterHealth = currentDungeonMonsterHealth;
+    }
 
     public void setId(Integer id) {
         this.id = id;
@@ -47,12 +94,28 @@ public class Game extends ModelObject{
         return gameMap;
     }
 
+    public Integer getStrength() {
+        return strength;
+    }
+
+    public void setStrength(Integer strength) {
+        this.strength = strength;
+    }
+
     public void setGameMap(GameMap gameMap) {
         this.gameMap = gameMap;
     }
 
     public Integer getHealth() {
         return this.health;
+    }
+
+    public Integer getCurrentDungeonId() {
+        return currentDungeonId;
+    }
+
+    public void setCurrentDungeonId(Integer currentDungeon) {
+        this.currentDungeonId = currentDungeon;
     }
 
     public void setHealth(Integer health) {
