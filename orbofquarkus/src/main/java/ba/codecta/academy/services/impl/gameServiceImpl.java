@@ -97,8 +97,10 @@ public class gameServiceImpl implements GameService {
         gameInBase.setLevel(gameStart.getLevel());
         gameInBase.setCharacter(character);
         gameInBase.setCurrentDungeonId(0);
-        gameInBase.setHighestDungeonId(0);
+        gameInBase.setDungeonsVisited(new ArrayList<>());
+        gameInBase.getDungeonsVisited().add(0);
         gameInBase.setScore(0);
+        gameInBase.setPreviousDungeon(-1);
         gameInBase.setCurrentDungeonMonsterHealth(gameInBase.getGameMap().getDungeons().get(0).getMonster().getHealth());
         gameInBase.setCurrentDungeonMonsterStrength(gameInBase.getGameMap().getDungeons().get(0).getMonster().getStrength());
 
@@ -125,19 +127,6 @@ public class gameServiceImpl implements GameService {
         }
         return null;
     }
-
-//    @Override
-//    public GameDto addPowerUpToGame(Integer gameId, Integer powerUpId) {
-//        PowerUp powerUp = powerUpsRepository.findById(powerUpId);
-//        Game game = gameRepository.findById(gameId);
-//        if(powerUp==null || game==null){
-//            return null;
-//        }
-//        game.addPowerUp(powerUp);
-//        gameRepository.save(game);
-//        ModelMapper modelMapper = new ModelMapper();
-//        return modelMapper.map(game, GameDto.class);
-//    }
 
     @Override
     public List<GameCharacterDto> findAllGameCharacters() {
@@ -392,7 +381,7 @@ public class gameServiceImpl implements GameService {
         gameMapInBase.setDungeons(new ArrayList<>());
 
         if(gameMap.getDungeonsIds()==null || gameMap.getDungeonsIds().isEmpty()){
-            for(int i=0;i<9;i++){
+            for(int i=0;i<24;i++){
                 int random = rand.nextInt(dungeonList.size());
                 Dungeon randomDungeon = dungeonList.get(random);
                 gameMapInBase.getDungeons().add(randomDungeon);
@@ -444,24 +433,24 @@ public class gameServiceImpl implements GameService {
     }
 
     @Override
-    public GameDto move(Integer id) {
+    public GameDto moveRight(Integer id) { //add 5 dungeons
         Game currentGame = gameRepository.findById(id);
         if(currentGame.getFinishedOn()==null && currentGame.getCurrentDungeonMonsterHealth()<=0){
             Integer currentDungeonId = currentGame.getCurrentDungeonId();
 
-            if(currentDungeonId+1 >= currentGame.getGameMap().getDungeons().size()){
+            if(currentDungeonId>=20){
                 return null;
             }
-            currentGame.setCurrentDungeonId(currentDungeonId+1);
+            currentGame.setPreviousDungeon(currentDungeonId);
+            currentGame.setCurrentDungeonId(currentDungeonId+5);
 
-            if(currentGame.getCurrentDungeonId()>currentGame.getHighestDungeonId()){
+            if(!currentGame.getDungeonsVisitedAndDefeated().contains(currentGame.getCurrentDungeonId())){
                 //we are in this dungeon first time
                 //if we change dungeons, we have to change current dungeon monster's health and strength
                 Dungeon newDungeon = currentGame.getGameMap().getDungeons().get(currentGame.getCurrentDungeonId());
-
                 currentGame.setCurrentDungeonMonsterStrength(newDungeon.getMonster().getStrength());
                 currentGame.setCurrentDungeonMonsterHealth(newDungeon.getMonster().getHealth());
-                currentGame.setHighestDungeonId(currentGame.getCurrentDungeonId());
+                currentGame.getDungeonsVisited().add(currentGame.getCurrentDungeonId());
             } else {
                 currentGame.setCurrentDungeonMonsterStrength(0);
                 currentGame.setCurrentDungeonMonsterHealth(0);
@@ -474,20 +463,31 @@ public class gameServiceImpl implements GameService {
         }
         else return null;
     }
-
     @Override
-    public GameDto goBack(Integer id) {
+    public GameDto moveLeft(Integer id) {
         Game currentGame = gameRepository.findById(id);
-
         if(currentGame.getFinishedOn()==null && currentGame.getCurrentDungeonMonsterHealth()<=0){
             Integer currentDungeonId = currentGame.getCurrentDungeonId();
 
-            if(currentDungeonId<1){
+            if((currentDungeonId+1)%5==0){ //we are on the far left, so no more moving to left possible
                 return null;
             }
-            currentGame.setCurrentDungeonId(currentDungeonId-1);
-            currentGame.setCurrentDungeonMonsterHealth(0);
-            currentGame.setCurrentDungeonMonsterStrength(0);
+            currentGame.setPreviousDungeon(currentDungeonId);
+            currentGame.setCurrentDungeonId(currentDungeonId+1);
+
+            if(!currentGame.getDungeonsVisitedAndDefeated().contains(currentGame.getCurrentDungeonId())){
+                //we are in this dungeon first time
+                //if we change dungeons, we have to change current dungeon monster's health and strength
+                Dungeon newDungeon = currentGame.getGameMap().getDungeons().get(currentGame.getCurrentDungeonId());
+                currentGame.setCurrentDungeonMonsterStrength(newDungeon.getMonster().getStrength());
+                currentGame.setCurrentDungeonMonsterHealth(newDungeon.getMonster().getHealth());
+                if(!currentGame.getDungeonsVisited().contains(currentGame.getCurrentDungeonId())){
+                    currentGame.getDungeonsVisited().add(currentGame.getCurrentDungeonId());
+                }
+            } else {
+                currentGame.setCurrentDungeonMonsterStrength(0);
+                currentGame.setCurrentDungeonMonsterHealth(0);
+            }
 
             currentGame = gameRepository.save(currentGame);
             ModelMapper modelMapper = new ModelMapper();
@@ -496,13 +496,80 @@ public class gameServiceImpl implements GameService {
         }
         else return null;
     }
+    @Override
+    public GameDto goBackRight(Integer id) {
+        Game currentGame = gameRepository.findById(id);
 
+        if(currentGame.getFinishedOn()==null && currentGame.getCurrentDungeonMonsterHealth()<=0){
+            Integer currentDungeonId = currentGame.getCurrentDungeonId();
+
+            if(currentDungeonId<5){
+                return null;
+            }
+
+            currentGame.setPreviousDungeon(currentDungeonId);
+            currentGame.setCurrentDungeonId(currentDungeonId-5);
+
+            if(!currentGame.getDungeonsVisitedAndDefeated().contains(currentGame.getCurrentDungeonId())){
+                //we are in this dungeon first time
+                //if we change dungeons, we have to change current dungeon monster's health and strength
+                Dungeon newDungeon = currentGame.getGameMap().getDungeons().get(currentGame.getCurrentDungeonId());
+                currentGame.setCurrentDungeonMonsterStrength(newDungeon.getMonster().getStrength());
+                currentGame.setCurrentDungeonMonsterHealth(newDungeon.getMonster().getHealth());
+                currentGame.getDungeonsVisited().add(currentGame.getCurrentDungeonId());
+            } else {
+                currentGame.setCurrentDungeonMonsterStrength(0);
+                currentGame.setCurrentDungeonMonsterHealth(0);
+            }
+
+            currentGame = gameRepository.save(currentGame);
+            ModelMapper modelMapper = new ModelMapper();
+            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+            return modelMapper.map(currentGame, GameDto.class);
+        }
+        else return null;
+    }
+    @Override
+    public GameDto goBackLeft(Integer id) {
+        Game currentGame = gameRepository.findById(id);
+
+        if(currentGame.getFinishedOn()==null && currentGame.getCurrentDungeonMonsterHealth()<=0){
+            Integer currentDungeonId = currentGame.getCurrentDungeonId();
+
+            if(currentDungeonId%5==0){
+                return null;
+            }
+            currentGame.setPreviousDungeon(currentDungeonId);
+            currentGame.setCurrentDungeonId(currentDungeonId-1);
+
+            if(!currentGame.getDungeonsVisitedAndDefeated().contains(currentGame.getCurrentDungeonId())){
+                //we are in this dungeon first time
+                //if we change dungeons, we have to change current dungeon monster's health and strength
+                Dungeon newDungeon = currentGame.getGameMap().getDungeons().get(currentGame.getCurrentDungeonId());
+                currentGame.setCurrentDungeonMonsterStrength(newDungeon.getMonster().getStrength());
+                currentGame.setCurrentDungeonMonsterHealth(newDungeon.getMonster().getHealth());
+                currentGame.getDungeonsVisited().add(currentGame.getCurrentDungeonId());
+            } else {
+                currentGame.setCurrentDungeonMonsterStrength(0);
+                currentGame.setCurrentDungeonMonsterHealth(0);
+            }
+
+            currentGame = gameRepository.save(currentGame);
+            ModelMapper modelMapper = new ModelMapper();
+            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+            return modelMapper.map(currentGame, GameDto.class);
+        }
+        else return null;
+    }
     @Override
     public GameDto fight(Integer id) {
         Game currentGame = gameRepository.findById(id);
         Random rand = new Random();
         int playerKickBound=0;
         int monsterKickBound=0;
+        if(currentGame.getDungeonsVisitedAndDefeated().contains(currentGame.getCurrentDungeonId())){
+            return null;
+        }
         switch (currentGame.getLevel()){
             case LOW:
                 playerKickBound=5;
@@ -532,6 +599,8 @@ public class gameServiceImpl implements GameService {
         if(currentGame.getHealth()<=0){
             currentGame.setFinishedOn(LocalDateTime.now());
             currentGame.setOutcome(Outcome.LOST);
+        } else {
+            currentGame.getDungeonsVisitedAndDefeated().add(currentGame.getCurrentDungeonId());
         }
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -548,8 +617,11 @@ public class gameServiceImpl implements GameService {
             if(currentDungeonId<1){
                 return null;
             }
-            currentGame.setCurrentDungeonId(currentDungeonId-1);
+
+            currentGame.setCurrentDungeonId(currentGame.getPreviousDungeon());
+            currentGame.setPreviousDungeon(currentDungeonId);
             currentGame.setHealth(currentGame.getHealth()/2);
+            currentGame.setStrength(currentGame.getStrength()/2);
             currentGame.setPowerUpList(new ArrayList<>()); //resetting powerups due to fleeing
             currentGame.setScore(currentGame.getScore()-100); //taking 100 from total score when fleeing
             currentGame.setCurrentDungeonMonsterHealth(0);

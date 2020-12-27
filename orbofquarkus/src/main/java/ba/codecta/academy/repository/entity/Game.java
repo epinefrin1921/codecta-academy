@@ -19,12 +19,17 @@ public class Game extends ModelObject{
     private Integer id;
     private String playerNickname;
     private Integer currentDungeonId;
-    private Integer highestDungeonId;
     private Integer currentDungeonMonsterHealth;
     private Integer currentDungeonMonsterStrength;
     private Integer score;
+    private Integer previousDungeon=-1;
 
     private Outcome outcome;
+    @ElementCollection
+    private List<Integer> dungeonsVisited = new ArrayList<>();
+    @ElementCollection
+    private List<Integer> dungeonsVisitedAndDefeated = new ArrayList<>();
+
 
     @ManyToOne
     private GameCharacter character;
@@ -50,12 +55,24 @@ public class Game extends ModelObject{
         return currentDungeonMonsterStrength;
     }
 
+    public List<Integer> getDungeonsVisitedAndDefeated() {
+        return dungeonsVisitedAndDefeated;
+    }
+
+    public void setDungeonsVisitedAndDefeated(List<Integer> dungeonsVisitedAndDefeated) {
+        this.dungeonsVisitedAndDefeated = dungeonsVisitedAndDefeated;
+    }
+
     public void setCurrentDungeonMonsterStrength(Integer getCurrentDungeonMonsterStrength) {
         this.currentDungeonMonsterStrength = getCurrentDungeonMonsterStrength;
     }
 
-    public Integer getHighestDungeonId() {
-        return highestDungeonId;
+    public List<Integer> getDungeonsVisited() {
+        return dungeonsVisited;
+    }
+
+    public void setDungeonsVisited(List<Integer> dungeonsVisited) {
+        this.dungeonsVisited = dungeonsVisited;
     }
 
     public Integer getScore() {
@@ -66,6 +83,14 @@ public class Game extends ModelObject{
         this.score = score;
     }
 
+    public Integer getPreviousDungeon() {
+        return previousDungeon;
+    }
+
+    public void setPreviousDungeon(Integer previousDungeon) {
+        this.previousDungeon = previousDungeon;
+    }
+
     public Outcome getOutcome() {
         return outcome;
     }
@@ -74,9 +99,6 @@ public class Game extends ModelObject{
         this.outcome = outcome;
     }
 
-    public void setHighestDungeonId(Integer highestDungeonId) {
-        this.highestDungeonId = highestDungeonId;
-    }
 
     public Integer getCurrentDungeonMonsterHealth() {
         return currentDungeonMonsterHealth;

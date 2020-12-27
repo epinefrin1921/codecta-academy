@@ -18,9 +18,27 @@ public class GameDto {
     private Integer strength;
     private Integer currentDungeonMonsterHealth;
     private Integer currentDungeonMonsterStrength;
-    private Integer highestDungeonId;
     private Integer currentDungeonId;
+    private Integer previousDungeon;
+    private List<Integer> dungeonsVisited=new ArrayList<>();
+    private List<Integer> dungeonsVisitedAndDefeated=new ArrayList<>();
     private GameMapDto gameMap;
+
+    public List<Integer> getDungeonsVisitedAndDefeated() {
+        return dungeonsVisitedAndDefeated;
+    }
+
+    public void setDungeonsVisitedAndDefeated(List<Integer> dungeonsVisitedAndDefeated) {
+        this.dungeonsVisitedAndDefeated = dungeonsVisitedAndDefeated;
+    }
+
+    public Integer getPreviousDungeon() {
+        return previousDungeon;
+    }
+
+    public void setPreviousDungeon(Integer previousDungeon) {
+        this.previousDungeon = previousDungeon;
+    }
 
     public Integer getCurrentDungeonMonsterHealth() {
         return currentDungeonMonsterHealth;
@@ -42,8 +60,12 @@ public class GameDto {
         this.currentDungeonMonsterStrength = currentDungeonMonsterStrength;
     }
 
-    public Integer getHighestDungeonId() {
-        return highestDungeonId;
+    public List<Integer> getDungeonsVisited() {
+        return dungeonsVisited;
+    }
+
+    public void setDungeonsVisited(List<Integer> dungeonsVisited) {
+        this.dungeonsVisited = dungeonsVisited;
     }
 
     public Integer getScore() {
@@ -52,10 +74,6 @@ public class GameDto {
 
     public void setScore(Integer score) {
         this.score = score;
-    }
-
-    public void setHighestDungeonId(Integer highestDungeonId) {
-        this.highestDungeonId = highestDungeonId;
     }
 
     public void setOutcome(Outcome outcome) {
@@ -72,8 +90,10 @@ public class GameDto {
 
     public List<DungeonDto> getGameMap() {
         List<DungeonDto> newMap = new ArrayList<>();
-        for(int i=0;i<highestDungeonId+1;i++){
-            newMap.add(gameMap.getDungeons().get(i));
+        for(int i=0;i<25;i++){
+            if(this.getDungeonsVisited().contains(i)) {
+                newMap.add(gameMap.getDungeons().get(i));
+            }
         }
         return newMap;
     }

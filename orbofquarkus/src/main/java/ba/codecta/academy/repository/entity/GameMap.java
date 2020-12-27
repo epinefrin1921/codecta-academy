@@ -33,7 +33,6 @@ public class GameMap extends ModelObject{
     private List<Dungeon> dungeons = new ArrayList<>();
 
 
-
     public void setId(Integer id) {
         this.id = id;
     }

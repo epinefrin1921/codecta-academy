@@ -6,6 +6,7 @@ public class GameCharacterDto {
     private String description;
     private Integer health;
     private Integer strength;
+    private Double averageScore;
 
     public Integer getId() {
         return id;
@@ -45,5 +46,11 @@ public class GameCharacterDto {
 
     public void setStrength(Integer strength) {
         this.strength = strength;
+    }
+    public Double getAverageScore() {
+        return ((double)this.health+this.strength)/2;
+    }
+    public void setAverageScore(Double averageScore) {
+        this.averageScore = averageScore;
     }
 }

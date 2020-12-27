@@ -44,8 +44,10 @@ public interface GameService {
     GameMapDto addGameMap(GameMapDto gameMap);
 
     GameDto usePowerUp(Integer id, PowerUpDto powerUp);
-    GameDto move(Integer id);
-    GameDto goBack(Integer id);
+    GameDto moveRight(Integer id);
+    GameDto moveLeft(Integer id);
+    GameDto goBackLeft(Integer id);
+    GameDto goBackRight(Integer id);
     GameDto fight(Integer id);
     GameDto flee(Integer id);
     GameDto collect(Integer id);

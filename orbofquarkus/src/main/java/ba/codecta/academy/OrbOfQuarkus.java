@@ -98,10 +98,20 @@ public class OrbOfQuarkus {
         return Response.status(Response.Status.BAD_REQUEST).entity(new Error("QoQ-001", "No power up in backpack.")) .build();
     }
     @POST
-    @Path("/game/{id}/move")
+    @Path("/game/{id}/move/right")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response moveGame(@PathParam("id") Integer id){
-        GameDto gameDto = gameService.move(id);
+    public Response moveRight(@PathParam("id") Integer id){
+        GameDto gameDto = gameService.moveRight(id);
+        if(gameDto!=null){
+            return Response.ok(gameDto).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("QoQ-002", "Cannot move. Beat the enemy in the dungeon/ (or at the end of the map)")) .build();
+    }
+    @POST
+    @Path("/game/{id}/move/left")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response moveLeft(@PathParam("id") Integer id){
+        GameDto gameDto = gameService.moveLeft(id);
         if(gameDto!=null){
             return Response.ok(gameDto).build();
         }
@@ -119,11 +129,22 @@ public class OrbOfQuarkus {
         return Response.status(Response.Status.BAD_REQUEST).entity(new Error("QoQ-003", "Cannot fight.")) .build();
     }
     @POST
-    @Path("/game/{id}/goback")
+    @Path("/game/{id}/goback/right")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response goBack(@PathParam("id") Integer id){
-        GameDto gameDto = gameService.goBack(id);
+    public Response goBackRight(@PathParam("id") Integer id){
+        GameDto gameDto = gameService.goBackRight(id);
+        if(gameDto!=null){
+            return Response.ok(gameDto).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity(new Error("QoQ-004", "Cannot go back. Maybe You are in the first dungeon? Is the enemy still alive?")) .build();
+    }
+    @POST
+    @Path("/game/{id}/goback/left")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response goBackLeft(@PathParam("id") Integer id){
+        GameDto gameDto = gameService.goBackLeft(id);
         if(gameDto!=null){
             return Response.ok(gameDto).build();
         }
