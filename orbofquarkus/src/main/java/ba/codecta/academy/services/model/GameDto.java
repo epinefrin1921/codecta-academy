@@ -87,12 +87,22 @@ public class GameDto {
     public void setCurrentDungeonId(Integer currentDungeonId) {
         this.currentDungeonId = currentDungeonId;
     }
+    public Integer getOrbDungeonId(){
+        for(int i=0;i<25;i++){
+            if(gameMap.getDungeons().get(i).getPowerUp().getPurpose().name().equals("ORB")){
+                return i;
+            }
+        }
+        return null;
+    }
 
     public List<DungeonDto> getGameMap() {
         List<DungeonDto> newMap = new ArrayList<>();
         for(int i=0;i<25;i++){
             if(this.getDungeonsVisited().contains(i)) {
                 newMap.add(gameMap.getDungeons().get(i));
+            } else{
+                newMap.add(new DungeonDto());
             }
         }
         return newMap;
